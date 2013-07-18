@@ -4,6 +4,7 @@ namespace Temping;
 
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
+use \SplFileObject;
 
 /**
  * Temping
@@ -61,7 +62,6 @@ class Temping {
 			RecursiveIteratorIterator::CHILD_FIRST
 		);
 		foreach ($iterator as $file_info) {
-			echo $file_info->getPathname() . PHP_EOL;
 			if(is_file($file_info->getPathname())) {
 				unlink($file_info->getPathname());
 			} else {
@@ -75,10 +75,11 @@ class Temping {
 	}
 
 	/**
-	 * Create $filename in the temporary directory. Folders will be
-	 * automatically created if they don't exist.
+	 * Create $filename containing $content in the temporary
+	 * directory. Folders will be automatically created if they don't
+	 * exist.
 	 */
-	public function create($filename) {
+	public function create($filename, $content = null) {
 		$last_slash = strrpos($filename, '/');
 		if($last_slash) {
 			$path = $this->dir . substr($filename, 0, $last_slash);
@@ -87,7 +88,8 @@ class Temping {
 			}
 		}
 		$filepath = $this->dir . $filename;
-		touch($filepath);
+		$file = new SplFileObject($filepath, 'w');
+		$file->fwrite($content);
 	}
 
 }

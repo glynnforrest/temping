@@ -75,5 +75,15 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileNotExists($filepath);
 	}
 
+	public function testCreateFileWithContents() {
+		$temp = Temping::getInstance();
+		$filename = 'text/files/message.txt';
+		$temp->create($filename, 'Hello world');
+		$filepath = $this->createFilePath($filename);
+		$this->assertFileExists($filepath);
+		$this->assertEquals('Hello world', file_get_contents($filepath));
+		$temp->destroy();
+		$this->assertFileNotExists($filepath);
+	}
 
 }
