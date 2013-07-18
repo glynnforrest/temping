@@ -45,4 +45,35 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileExists($this->createFilePath(null));
 	}
 
+	public function testCreateSingleFile() {
+		$temp = Temping::getInstance();
+		$filename = 'file.txt';
+		$temp->create($filename);
+		$filepath = $this->createFilePath($filename);
+		$this->assertFileExists($filepath);
+		$temp->destroy();
+		$this->assertFileNotExists($filepath);
+	}
+
+	public function testCreateFileWithinDirectory() {
+		$temp = Temping::getInstance();
+		$filename = '.hidden/secrets.gpg';
+		$temp->create($filename);
+		$filepath = $this->createFilePath($filename);
+		$this->assertFileExists($filepath);
+		$temp->destroy();
+		$this->assertFileNotExists($filepath);
+	}
+
+	public function testCreateFileDeepWithinDirectory() {
+		$temp = Temping::getInstance();
+		$filename = 'deeply/nested/dirs/with/stuff/in/file.php';
+		$temp->create($filename);
+		$filepath = $this->createFilePath($filename);
+		$this->assertFileExists($filepath);
+		$temp->destroy();
+		$this->assertFileNotExists($filepath);
+	}
+
+
 }

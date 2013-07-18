@@ -2,6 +2,9 @@
 
 namespace Temping;
 
+use \RecursiveDirectoryIterator;
+use \RecursiveIteratorIterator;
+
 /**
  * Temping
  *
@@ -42,7 +45,7 @@ class Temping {
 		}
 		$this->dir = $directory . self::temping_dir_name;
 		if(!file_exists($this->dir)) {
-			mkdir($this->dir);
+			mkdir($this->dir, 0777);
 		}
 	}
 
@@ -51,11 +54,40 @@ class Temping {
 	 * within it.
 	 */
 	public function destroy() {
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator(
+				$this->dir, RecursiveDirectoryIterator::SKIP_DOTS
+			),
+			RecursiveIteratorIterator::CHILD_FIRST
+		);
+		foreach ($iterator as $file_info) {
+			echo $file_info->getPathname() . PHP_EOL;
+			if(is_file($file_info->getPathname())) {
+				unlink($file_info->getPathname());
+			} else {
+				//because of CHILD_FIRST, all files will be deleted by now
+				rmdir($file_info->getPathname());
+			}
+		}
 		if(file_exists($this->dir)) {
 			rmdir($this->dir);
 		}
 	}
 
-
+	/**
+	 * Create $filename in the temporary directory. Folders will be
+	 * automatically created if they don't exist.
+	 */
+	public function create($filename) {
+		$last_slash = strrpos($filename, '/');
+		if($last_slash) {
+			$path = $this->dir . substr($filename, 0, $last_slash);
+			if(!file_exists($path)) {
+				mkdir($path, 0777, true);
+			}
+		}
+		$filepath = $this->dir . $filename;
+		touch($filepath);
+	}
 
 }
