@@ -17,6 +17,9 @@ class Temping {
 
 	protected static $instance;
 
+	//set to true after init(), false after reset()
+	protected $init;
+
 	//path to the temporary directory where all Temping files are
 	//created.
 	protected $dir;
@@ -37,7 +40,6 @@ class Temping {
 		if(!self::$instance) {
 			self::$instance = new self();
 		}
-		self::$instance->init();
 		return self::$instance;
 	}
 
@@ -53,6 +55,7 @@ class Temping {
 		if(!file_exists($this->dir)) {
 			mkdir($this->dir, 0777);
 		}
+		$this->init = true;
 	}
 
 	/**
@@ -60,6 +63,9 @@ class Temping {
 	 * within it.
 	 */
 	public function reset() {
+		if(!$this->init) {
+			return true;
+		}
 		$iterator = new RecursiveIteratorIterator(
 			new RecursiveDirectoryIterator(
 				$this->dir, RecursiveDirectoryIterator::SKIP_DOTS
@@ -78,6 +84,7 @@ class Temping {
 			rmdir($this->dir);
 		}
 		$this->files = array();
+		$this->init = false;
 	}
 
 	/**

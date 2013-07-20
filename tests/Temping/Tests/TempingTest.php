@@ -37,28 +37,8 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($this->temp instanceof Temping);
 	}
 
-	public function testTempingDirCreatedOnConstruct() {
-		$this->assertFileExists($this->createFilePath(null));
-	}
-
-	public function testTempingDirRemoved() {
-		$this->temp->reset();
+	public function testTempingDirIsNotCreatedOnConstruct() {
 		$this->assertFileNotExists($this->createFilePath(null));
-	}
-
-	public function testTempingDirRecreatedAfterReset() {
-		$this->temp->reset();
-		$this->assertFileNotExists($this->createFilePath(null));
-		$another_instance = Temping::getInstance();
-		$this->assertFileExists($this->createFilePath(null));
-	}
-
-	public function testTempingDirRecreatedAfterResetSameInstance() {
-		$this->temp->reset();
-		$this->assertFileNotExists($this->createFilePath(null));
-		$filename = '.file';
-		$this->temp->create($filename);
-		$this->assertFileExists($this->createFilePath(null));
 	}
 
 	public function testCreateSingleFile() {
@@ -68,6 +48,29 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileExists($filepath);
 		$this->temp->reset();
 		$this->assertFileNotExists($filepath);
+	}
+
+	public function testTempingDirCreatedThenRemovedAfterReset() {
+		$this->temp->create('file');
+		$this->assertFileExists($this->createFilePath(null));
+		$this->temp->reset();
+		$this->assertFileNotExists($this->createFilePath(null));
+	}
+
+	public function testTempingDirRecreatedAfterReset() {
+		$this->temp->reset();
+		$this->assertFileNotExists($this->createFilePath(null));
+		$another_instance = Temping::getInstance();
+		$another_instance->create('file');
+		$this->assertFileExists($this->createFilePath(null));
+	}
+
+	public function testTempingDirRecreatedAfterResetSameInstance() {
+		$this->temp->reset();
+		$this->assertFileNotExists($this->createFilePath(null));
+		$filename = '.file';
+		$this->temp->create($filename);
+		$this->assertFileExists($this->createFilePath(null));
 	}
 
 	public function testCreateFileWithinDirectory() {
@@ -162,6 +165,5 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($content, $this->temp->getContents($id));
 		$this->assertEquals($content, $this->temp->getContents($filename));
 	}
-
 
 }
