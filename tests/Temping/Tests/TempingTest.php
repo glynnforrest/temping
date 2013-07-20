@@ -116,8 +116,25 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$filename = 'file';
 		$id = $this->temp->create($filename);
 		$this->assertEquals(1, $id);
-		$other_id = $this->temp->create($filename);
+		$other_filename = 'file2';
+		$other_id = $this->temp->create($other_filename);
 		$this->assertEquals(2, $other_id);
+	}
+
+	public function testCreateSameFileReturnsSameId() {
+		$filename = 'testing/.test';
+		$id = $this->temp->create($filename);
+		$other_id = $this->temp->create($filename);
+		$this->assertEquals($id, $other_id);
+	}
+
+	public function testCreateSameFileCanOverwriteContent() {
+		$filename = 'my-file.txt';
+		$id = $this->temp->create($filename, 'Hello world');
+		$this->assertEquals('Hello world', file_get_contents($this->createFilePath($filename)));
+		$other_id = $this->temp->create($filename, 'Hello again');
+		$this->assertEquals('Hello again', file_get_contents($this->createFilePath($filename)));
+		$this->assertEquals($id, $other_id);
 	}
 
 	public function testResetResetInternalFilesArray() {

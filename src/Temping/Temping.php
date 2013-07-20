@@ -100,6 +100,11 @@ class Temping {
 		$filepath = $this->dir . $filename;
 		$file = new SplFileObject($filepath, 'w');
 		$file->fwrite($content);
+		//check if the file has been used before
+		$id = array_search($filename, $this->files);
+		if($id !== false) {
+			return $id + 1;
+		}
 		$this->files[] = $filename;
 		end($this->files);
 		//don't allow an id of 0 to be returned due to PHP's weak types
