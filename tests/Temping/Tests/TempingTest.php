@@ -192,4 +192,12 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->temp->setContents($filename, 'Hello again');
 	}
 
+	public function testFilenamesCanBeIntegers() {
+		$filename = 1;
+		$content = 'Contents of integer-named file';
+		$id = $this->temp->create($filename, $content);
+		$this->assertEquals($content, $this->temp->getContents($filename));
+		$this->assertEquals($content, $this->temp->getContents($id));
+	}
+
 }
