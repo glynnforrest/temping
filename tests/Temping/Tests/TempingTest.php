@@ -4,6 +4,8 @@ namespace Temping\Tests;
 
 use Temping\Temping;
 
+use \SplFileObject;
+
 include(__DIR__ . '/../../bootstrap.php');
 
 /**
@@ -12,6 +14,10 @@ include(__DIR__ . '/../../bootstrap.php');
  * @author Glynn Forrest <me@glynnforrest.com>
  **/
 class TempingTest extends \PHPUnit_Framework_TestCase {
+
+	public function tearDown() {
+		Temping::getInstance()->reset();
+	}
 
 	protected function createFilePath($filename) {
 		$tmp_dir = sys_get_temp_dir();
@@ -33,15 +39,24 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testTempingDirRemoved() {
 		$temp = Temping::getInstance();
-		$temp->destroy();
+		$temp->reset();
 		$this->assertFileNotExists($this->createFilePath(null));
 	}
 
-	public function testTempingDirRecreatedAfterDestroy() {
+	public function testTempingDirRecreatedAfterReset() {
 		$temp = Temping::getInstance();
-		$temp->destroy();
+		$temp->reset();
 		$this->assertFileNotExists($this->createFilePath(null));
 		$another_instance = Temping::getInstance();
+		$this->assertFileExists($this->createFilePath(null));
+	}
+
+	public function testTempingDirRecreatedAfterResetSameInstance() {
+		$temp = Temping::getInstance();
+		$temp->reset();
+		$this->assertFileNotExists($this->createFilePath(null));
+		$filename = '.file';
+		$temp->create($filename);
 		$this->assertFileExists($this->createFilePath(null));
 	}
 
@@ -51,7 +66,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$temp->create($filename);
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
-		$temp->destroy();
+		$temp->reset();
 		$this->assertFileNotExists($filepath);
 	}
 
@@ -61,7 +76,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$temp->create($filename);
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
-		$temp->destroy();
+		$temp->reset();
 		$this->assertFileNotExists($filepath);
 	}
 
@@ -71,7 +86,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$temp->create($filename);
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
-		$temp->destroy();
+		$temp->reset();
 		$this->assertFileNotExists($filepath);
 	}
 
@@ -82,8 +97,47 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 		$this->assertEquals('Hello world', file_get_contents($filepath));
-		$temp->destroy();
+		$temp->reset();
 		$this->assertFileNotExists($filepath);
 	}
+
+	public function testCreateReturnsId() {
+		$temp = Temping::getInstance();
+		$filename = 'file';
+		$id = $temp->create($filename);
+		$this->assertEquals(1, $id);
+		$other_id = $temp->create($filename);
+		$this->assertEquals(2, $other_id);
+	}
+
+	public function testResetResetInternalFilesArray() {
+		$temp = Temping::getInstance();
+		$filename = 'file';
+		$id = $temp->create($filename);
+		$this->assertEquals(1, $id);
+		$temp->reset();
+		$other_id = $temp->create($filename);
+		$this->assertEquals(1, $other_id);
+	}
+
+	public function testGetFileObject() {
+		$temp = Temping::getInstance();
+		$filename = 'file';
+		$id = $temp->create($filename);
+		$file_object = $temp->getFileObject($id);
+		$this->assertTrue($file_object instanceof SplFileObject);
+		$this->assertEquals(
+			$this->createFilePath($filename), $file_object->getPathname());
+	}
+
+	public function testGetContents() {
+		$temp = Temping::getInstance();
+		$filename = 'test/file_with_contents.txt';
+		$content = 'Content of text file';
+		$id = $temp->create($filename, $content);
+		$this->assertEquals($content, $temp->getContents($id));
+		$this->assertEquals($content, $temp->getContents($filename));
+	}
+
 
 }
