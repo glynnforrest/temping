@@ -70,10 +70,6 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileNotExists($filepath);
 	}
 
-	public function testCreateFileIllegalPathName() {
-	}
-
-
 	public function testCreateFileWithinDirectory() {
 		$filename = '.hidden/secrets.gpg';
 		$this->temp->create($filename);
@@ -90,6 +86,20 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileExists($filepath);
 		$this->temp->reset();
 		$this->assertFileNotExists($filepath);
+	}
+
+	public function testCreateFileStartingWithSlash () {
+		$filename = '/folder/file.txt';
+		$this->temp->create($filename);
+		$filepath = $this->createFilePath($filename);
+		$this->assertFileExists($filepath);
+	}
+
+	public function testCreateFileWithManySlashes() {
+		$filename = 'file//with////toomanyslashes';
+		$this->temp->create($filename);
+		$filepath = $this->createFilePath($filename);
+		$this->assertFileExists($filepath);
 	}
 
 	public function testCreateFileWithContents() {
