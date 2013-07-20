@@ -93,7 +93,7 @@ class Temping {
 	 * exist.
 	 * @param string $filename File path of the file to create.
 	 * @param string $content Content to write to the file.
-	 * @return int $id the id of the created file.
+	 * @return int $id The id of the created file.
 	 */
 	public function create($filename, $content = null) {
 		$this->init();
@@ -148,13 +148,31 @@ class Temping {
 	/**
 	 * Get the contents of a file.
 	 *
-	 * @param mixed $id_or_filename the id returned by create() or the
+	 * @param mixed $id_or_filename The id returned by create() or the
 	 * filename passed to the create().
 	 * @return string The contents of the file.
 	 */
 	public function getContents($id_or_filename) {
 		$file_object = $this->getFileObject($id_or_filename);
 		return file_get_contents($file_object->getPathname());
+	}
+
+	/**
+	 * Write $content to a file.
+	 *
+	 * @param mixed $id_or_filename The id returned by create() or the
+	 * filename passed to the create().
+	 * @param string $content The content to write to the file.
+	 * @return The number of bytes written
+	 * @throws \Exception When the write failed.
+	 */
+	public function setContents($id_or_filename, $content) {
+		$file_object = $this->getFileObject($id_or_filename, 'w');
+		$bytes = $file_object->fwrite($content);
+		if($bytes) {
+			return $bytes;
+		}
+		throw new \Exception("Unable to write to " . $file_object->getPathname());
 	}
 
 }

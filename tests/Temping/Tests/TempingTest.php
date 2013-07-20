@@ -152,10 +152,16 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	public function testGetFileObject() {
 		$filename = 'file';
 		$id = $this->temp->create($filename);
-		$file_object = $this->temp->getFileObject($id);
-		$this->assertTrue($file_object instanceof SplFileObject);
+
+		$file_object_id = $this->temp->getFileObject($id);
+		$this->assertTrue($file_object_id instanceof SplFileObject);
 		$this->assertEquals(
-			$this->createFilePath($filename), $file_object->getPathname());
+			$this->createFilePath($filename), $file_object_id->getPathname());
+
+		$file_object_filename = $this->temp->getFileObject($filename);
+		$this->assertTrue($file_object_filename instanceof SplFileObject);
+		$this->assertEquals(
+			$this->createFilePath($filename), $file_object_filename->getPathname());
 	}
 
 	public function testGetContents() {
@@ -164,6 +170,26 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$id = $this->temp->create($filename, $content);
 		$this->assertEquals($content, $this->temp->getContents($id));
 		$this->assertEquals($content, $this->temp->getContents($filename));
+	}
+
+	public function testSetContents() {
+		$filename = 'my_message.md';
+		$id = $this->temp->create($filename, 'Hello world');
+		$filepath = $this->createFilePath($filename);
+		$this->assertEquals('Hello world', file_get_contents($filepath));
+		$this->temp->setContents($filename, 'Hello again');
+		$this->assertEquals('Hello again', file_get_contents($filepath));
+		$this->temp->setContents($id, 'Hello once more');
+		$this->assertEquals('Hello once more', file_get_contents($filepath));
+	}
+
+	public function testSetContentsThrowsExceptionOnFailedWrite() {
+		$filename = 'my_message.md';
+		$this->temp->create($filename, 'Hello world');
+		$filepath = $this->createFilePath($filename);
+		chmod($filepath, 000);
+		$this->setExpectedException('\Exception');
+		$this->temp->setContents($filename, 'Hello again');
 	}
 
 }
