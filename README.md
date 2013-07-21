@@ -42,9 +42,8 @@ working with temporary files can be difficult and error-prone.
     }
 
 This approach makes it very difficult to efficiently clean up all
-temporary files after a test, and really doesn't scale very well as
-the test case grows. And what if the system you're testing on doesn't
-have /tmp?
+temporary files after a test, and doesn't scale well as the test case
+grows. And what if the system you're testing on doesn't have /tmp?
 
 Temping abstracts away all this pain to make working with temporary
 files easy.
@@ -56,7 +55,7 @@ composer.json file:
 
 	{
 		"require": {
-			"glynnforrest/temping": "*"
+			"glynnforrest/temping": "dev-master"
 		}
 	}
 
