@@ -176,13 +176,18 @@ class Temping {
 	}
 
 	/**
-	 * Get the full path name of a file.
+	 * Get the full path name of a file. If $id_or_filename is not
+	 * provided, the path name of the Temping directory will be
+	 * returned.
 	 *
 	 * @param mixed $id_or_filename The id returned by create() or the
 	 * filename passed to create().
 	 * @return string The full path name of the file.
 	 */
-	public function getPathname($id_or_filename) {
+	public function getPathname($id_or_filename = null) {
+		if(!$id_or_filename) {
+			return $this->dir;
+		}
 		$file_object = $this->getFileObject($id_or_filename, 'r');
 		return $file_object->getPathname();
 	}

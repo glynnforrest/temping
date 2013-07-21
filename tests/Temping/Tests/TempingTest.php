@@ -230,6 +230,11 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $this->temp->getPathname($filename));
 	}
 
+	public function testGetPathnameReturnsFolder() {
+		$expected = $this->createFilePath(null);
+		$this->assertEquals($expected, $this->temp->getPathname());
+	}
+
 	public function testGetPathnameThrowsExceptionOnUnknownFile() {
 		$id = 44;
 		$message = 'File or id not found: ' . $id;
