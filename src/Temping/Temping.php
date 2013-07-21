@@ -175,4 +175,16 @@ class Temping {
 		throw new \Exception("Unable to write to " . $file_object->getPathname());
 	}
 
+	/**
+	 * Get the full path name of a file.
+	 *
+	 * @param mixed $id_or_filename The id returned by create() or the
+	 * filename passed to create().
+	 * @return string The full path name of the file.
+	 */
+	public function getPathname($id_or_filename) {
+		$file_object = $this->getFileObject($id_or_filename, 'r');
+		return $file_object->getPathname();
+	}
+
 }

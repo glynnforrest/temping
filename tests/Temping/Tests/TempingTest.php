@@ -200,4 +200,12 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($content, $this->temp->getContents($id));
 	}
 
+	public function testGetPathname() {
+		$filename = 'folder/my-db.sql';
+		$id = $this->temp->create($filename);
+		$expected = $this->createFilePath($filename);
+		$this->assertEquals($expected, $this->temp->getPathname($id));
+		$this->assertEquals($expected, $this->temp->getPathname($filename));
+	}
+
 }
