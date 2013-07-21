@@ -165,12 +165,26 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('php', $file_object_id->getExtension());
 	}
 
+	public function testGetFileObjectThrowsExceptionOnUnknownFile() {
+		$id = 42;
+		$message = 'File or id not found: ' . $id;
+		$this->setExpectedException('\Exception', $message);
+		$this->temp->getFileObject($id);
+	}
+
 	public function testGetContents() {
 		$filename = 'test/file_with_contents.txt';
 		$content = 'Content of text file';
 		$id = $this->temp->create($filename, $content);
 		$this->assertEquals($content, $this->temp->getContents($id));
 		$this->assertEquals($content, $this->temp->getContents($filename));
+	}
+
+	public function testGetContentsThrowsExceptionOnUnknownFile() {
+		$filename = 'file-not-created-yet.txt';
+		$message = 'File or id not found: ' . $filename;
+		$this->setExpectedException('\Exception', $message);
+		$this->temp->getContents($filename);
 	}
 
 	public function testSetContents() {
@@ -182,6 +196,13 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('Hello again', file_get_contents($filepath));
 		$this->temp->setContents($id, 'Hello once more');
 		$this->assertEquals('Hello once more', file_get_contents($filepath));
+	}
+
+	public function testSetContentsThrowsExceptionOnUnknownFile() {
+		$filename = 'unknown';
+		$message = 'File or id not found: ' . $filename;
+		$this->setExpectedException('\Exception', $message);
+		$this->temp->setContents($filename, 'Some content');
 	}
 
 	public function testSetContentsThrowsExceptionOnFailedWrite() {
@@ -207,6 +228,13 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$expected = $this->createFilePath($filename);
 		$this->assertEquals($expected, $this->temp->getPathname($id));
 		$this->assertEquals($expected, $this->temp->getPathname($filename));
+	}
+
+	public function testGetPathnameThrowsExceptionOnUnknownFile() {
+		$id = 44;
+		$message = 'File or id not found: ' . $id;
+		$this->setExpectedException('\Exception', $message);
+		$this->temp->getPathname($id);
 	}
 
 }

@@ -135,9 +135,9 @@ class Temping {
 			//check for id
 			//decrement id by 1 as an id of 0 should not be exposed to
 			//the user due to PHP's weak types.
-			$id_or_filename = (int) $id_or_filename - 1;
-			if(array_key_exists($id_or_filename, $this->files)) {
-				$filename = $this->files[$id_or_filename];
+			$id = (int) $id_or_filename - 1;
+			if(array_key_exists($id, $this->files)) {
+				$filename = $this->files[$id];
 			} else {
 				throw new \Exception("File or id not found: $id_or_filename");
 			}
