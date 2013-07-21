@@ -96,21 +96,43 @@ can use the filename specified in the create() method too.
     echo $temp->getContents($filename);
     //Hello, world!
 
-To do other fancy things with your temporary files, you can grab a
-SplFileObject instance.
+Get the full path name of a file:
 
     $id = $temp->create('my-file.php');
-    $obj = $temp->getFileObject($id);
-    echo $obj->getPathname();
+    echo $temp->getPathname($id);
     // /tmp/php-temping/my-file.php
 
     //OR
 
     $filename = 'my-file.php';
     $temp->create($filename);
-    $obj = $temp->getFileObject($filename);
-    echo $obj->getPathname();
+    echo $temp->getPathname($filename);
     // /tmp/php-temping/my-file.php
+
+To do other fancy things with your temporary files, you can grab a
+SplFileObject instance.
+
+    $id = $temp->create('my-file.php');
+    $obj = $temp->getFileObject($id);
+    echo $obj->getExtension();
+    //php
+
+    //OR
+
+    $filename = 'my-file.php';
+    $temp->create($filename);
+    $obj = $temp->getFileObject($filename);
+    echo $obj->getExtension();
+    //php
+
+The default mode of the SplFileObject is read-only, 'r'. Pass any
+accepted parameter to fopen() in the second argument to get a
+different mode.
+
+    $filename = 'my-file.txt;
+    $temp->create($filename);
+    $obj = $temp->getFileObject($filename, 'w');
+    //Now able to write to my-file.txt
 
 Finally, to obliterate all the temporary files you've created, call
 reset().

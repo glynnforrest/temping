@@ -150,7 +150,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetFileObject() {
-		$filename = 'file';
+		$filename = 'file.php';
 		$id = $this->temp->create($filename);
 
 		$file_object_id = $this->temp->getFileObject($id);
@@ -162,6 +162,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($file_object_filename instanceof SplFileObject);
 		$this->assertEquals(
 			$this->createFilePath($filename), $file_object_filename->getPathname());
+		$this->assertEquals('php', $file_object_id->getExtension());
 	}
 
 	public function testGetContents() {
