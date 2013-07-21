@@ -21,7 +21,8 @@ working with temporary files can be difficult and error-prone.
             //create a directory to put temporary files in
             mkdir('/tmp/test-dir', 0775, true);
             //create the files used in the test
-            file_put_contents('/tmp/test-dir/file.txt', 'Hello, world');
+            file_put_contents(self::file, 'Hello, world');
+            file_put_contents(self::file2, 'Hello, world');
         }
 
         public function tearDown() {
