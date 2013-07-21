@@ -96,7 +96,7 @@ can use the filename specified in the create() method too.
     echo $temp->getContents($filename);
     //Hello, world!
 
-Get the full path name of a file:
+Get the full path name of a file
 
     $id = $temp->create('my-file.php');
     echo $temp->getPathname($id);
@@ -108,6 +108,11 @@ Get the full path name of a file:
     $temp->create($filename);
     echo $temp->getPathname($filename);
     // /tmp/php-temping/my-file.php
+
+Get the full path to the Temping directory
+
+    echo $temp->getDirectory();
+    // /tmp/php-temping/
 
 To do other fancy things with your temporary files, you can grab a
 SplFileObject instance.
