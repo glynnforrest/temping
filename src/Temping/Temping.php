@@ -96,7 +96,9 @@ class Temping {
 	 * @return int $id The id of the created file.
 	 */
 	public function create($filename, $content = null) {
-		$this->init();
+		if(!$this->init) {
+			$this->init();
+		}
 		$last_slash = strrpos($filename, '/');
 		if($last_slash) {
 			$path = $this->dir . substr($filename, 0, $last_slash);
@@ -192,6 +194,9 @@ class Temping {
 	 * trailing slash.
 	 */
 	public function getDirectory() {
+		if(!$this->init) {
+			$this->init();
+		}
 		return $this->dir;
 	}
 
