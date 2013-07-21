@@ -13,7 +13,7 @@ use \SplFileObject;
  **/
 class Temping {
 
-	const temping_dir_name = 'php-temping/';
+	const TEMPING_DIR_NAME = 'php-temping/';
 
 	protected static $instance;
 
@@ -51,7 +51,7 @@ class Temping {
 		if(substr($directory, -1) !== '/') {
 			$directory .= '/';
 		}
-		$this->dir = $directory . self::temping_dir_name;
+		$this->dir = $directory . self::TEMPING_DIR_NAME;
 		if(!file_exists($this->dir)) {
 			mkdir($this->dir, 0777);
 		}
@@ -149,7 +149,7 @@ class Temping {
 	 * Get the contents of a file.
 	 *
 	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to the create().
+	 * filename passed to create().
 	 * @return string The contents of the file.
 	 */
 	public function getContents($id_or_filename) {
@@ -161,7 +161,7 @@ class Temping {
 	 * Write $content to a file.
 	 *
 	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to the create().
+	 * filename passed to create().
 	 * @param string $content The content to write to the file.
 	 * @return The number of bytes written
 	 * @throws \Exception When the write failed.

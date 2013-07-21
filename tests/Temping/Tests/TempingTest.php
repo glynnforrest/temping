@@ -30,7 +30,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		if(substr($tmp_dir, -1) !== '/') {
 			$tmp_dir .= '/';
 		}
-		return $tmp_dir . Temping::temping_dir_name . $filename;
+		return $tmp_dir . Temping::TEMPING_DIR_NAME . $filename;
 	}
 
 	public function testGetInstance() {
