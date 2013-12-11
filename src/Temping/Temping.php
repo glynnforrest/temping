@@ -89,8 +89,9 @@ class Temping {
 
 	/**
 	 * Create $filename containing $content in the temporary
-	 * directory. Folders will be automatically created if they don't
-	 * exist.
+	 * directory. Directories will be created automatically if they
+	 * don't exist.
+	 *
 	 * @param string $filename File path of the file to create.
 	 * @param string $content Content to write to the file.
 	 * @return int $id The id of the created file.
@@ -101,10 +102,8 @@ class Temping {
 		}
 		$last_slash = strrpos($filename, '/');
 		if($last_slash) {
-			$path = $this->dir . substr($filename, 0, $last_slash);
-			if(!file_exists($path)) {
-				mkdir($path, 0777, true);
-			}
+			$directory = substr($filename, 0, $last_slash);
+			$this->createDirectory($directory);
 		}
 		$filepath = $this->dir . $filename;
 		$file = new SplFileObject($filepath, 'w');
@@ -118,6 +117,24 @@ class Temping {
 		end($this->files);
 		//don't allow an id of 0 to be returned due to PHP's weak types
 		return key($this->files) + 1;
+	}
+
+	/**
+	 * Create a new directory in the temporary
+	 * directory. Sub-directories will be created automatically if
+	 * they don't exist.
+	 *
+	 * @param string $directory Path of the directory to create.
+	 */
+	public function createDirectory($directory) {
+		if(!$this->init) {
+			$this->init();
+		}
+		$path = $this->dir . $directory;
+		if(!file_exists($path)) {
+			mkdir($path, 0777, true);
+		}
+		return true;
 	}
 
 	/**

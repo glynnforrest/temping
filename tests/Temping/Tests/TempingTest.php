@@ -41,6 +41,24 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileNotExists($this->createFilePath(null));
 	}
 
+	public function testCreateDirectory() {
+		$dir = 'storage';
+		$this->temp->createDirectory($dir);
+		$filepath = $this->createFilePath($dir);
+		$this->assertTrue(is_dir($filepath));
+		$this->temp->reset();
+		$this->assertFalse(is_dir($filepath));
+	}
+
+	public function testCreateNestedDirectory() {
+		$dir = '/some/deep/nested/directory';
+		$this->temp->createDirectory($dir);
+		$filepath = $this->createFilePath($dir);
+		$this->assertTrue(is_dir($filepath));
+		$this->temp->reset();
+		$this->assertFalse(is_dir($filepath));
+	}
+
 	public function testCreateSingleFile() {
 		$filename = 'file.txt';
 		$this->temp->create($filename);
