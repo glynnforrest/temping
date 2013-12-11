@@ -54,16 +54,16 @@ files easy.
 Temping is installed via Composer. To add it to your project, simply add it to your
 composer.json file:
 
-	{
-		"require": {
-			"glynnforrest/temping": "dev-master"
-		}
-	}
+    {
+        "require": {
+            "glynnforrest/temping": "dev-master"
+        }
+    }
 
 And run composer to update your dependencies:
 
-	$ curl -s http://getcomposer.org/installer | php
-	$ php composer.phar update
+    $ curl -s http://getcomposer.org/installer | php
+    $ php composer.phar update
 
 
 ## Usage
@@ -74,6 +74,12 @@ Creating a blank file
     $temp->create('my-file.txt');
     //automatically create subdirectories too
     $temp->create('file/in/sub/directory.php')
+
+Creating an empty directory
+
+    $temp->createDirectory('storage');
+    //automatically create subdirectories too
+    $temp->createDirectory('storage/with/sub/directories')
 
 Creating a file with contents
 
