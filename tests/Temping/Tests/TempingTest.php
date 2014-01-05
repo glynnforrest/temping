@@ -262,33 +262,49 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testExistsFile() {
-		$expected = $this->temp->create('foo');
-		$result = $this->temp->exists('foo');
-		$expected = file_exists($this->createFilePath('foo'));
+		$file = 'path/to/foo.txt';
+		//id
+		$id = $this->temp->create($file);
+		$this->assertTrue($this->temp->exists($id));
+		//filename
+		$result = $this->temp->exists($file);
 		$this->assertTrue($result);
+		//same as file_exists?
+		$expected = file_exists($this->createFilePath($file));
 		$this->assertSame($expected, $result);
 
 		$this->temp->reset();
-		$result = $this->temp->exists('foo');
-		$expected = file_exists($this->createFilePath('foo'));
+
+		//id
+		$this->assertFalse($this->temp->exists($id));
+		//filename
+		$result = $this->temp->exists($file);
 		$this->assertFalse($result);
+		//same as file_exists?
+		$expected = file_exists($this->createFilePath($file));
 		$this->assertSame($expected, $result);
 	}
 
 	public function testExistsDir() {
-		$expected = $this->temp->createDirectory('foo');
-		$result = $this->temp->exists('foo');
-		$expected = file_exists($this->createFilePath('foo'));
+		$dir = '/path/to/some/dir';
+		$this->temp->createDirectory($dir);
+		//filename
+		$result = $this->temp->exists($dir);
 		$this->assertTrue($result);
+		//same as file_exists?
+		$expected = file_exists($this->createFilePath($dir));
 		$this->assertSame($expected, $result);
-		$this->assertTrue(is_dir($this->createFilePath('foo')));
+		$this->assertTrue(is_dir($this->createFilePath($dir)));
 
 		$this->temp->reset();
-		$result = $this->temp->exists('foo');
-		$expected = file_exists($this->createFilePath('foo'));
+
+		//filename
+		$result = $this->temp->exists($dir);
 		$this->assertFalse($result);
+		//same as file_exists?
+		$expected = file_exists($this->createFilePath($dir));
 		$this->assertSame($expected, $result);
-		$this->assertFalse(is_dir($this->createFilePath('foo')));
+		$this->assertFalse(is_dir($this->createFilePath($dir)));
 	}
 
 }
