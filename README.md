@@ -145,6 +145,23 @@ different mode.
     $obj = $temp->getFileObject($filename, 'w');
     //Now able to write to my-file.txt
 
+To check if a file or directory has been created, use exists(). You
+can also use the $id returned by create() for checking a file.
+
+    $this->temp->createDirectory('some/dir');
+    $this->temp->exists('some/dir');
+    //true
+
+    $id = $this->temp->create('foo/bar.txt');
+    $this->temp->exists('foo/bar.txt);
+    //true
+    $this->temp->exists($id);
+    //true
+
+    $this->temp->exists('something');
+    //false
+
+
 Finally, to obliterate all the temporary files you've created, call
 reset().
 
