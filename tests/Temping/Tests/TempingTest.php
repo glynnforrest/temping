@@ -250,7 +250,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetPathnameThrowsExceptionOnUnknownFile() {
 		$id = 44;
-		$message = 'File or id not found: ' . $id;
+		$message = 'File or id not found: 44';
 		$this->setExpectedException('\Exception', $message);
 		$this->temp->getPathname($id);
 	}
@@ -259,6 +259,36 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$expected = $this->createFilePath(null);
 		$this->assertEquals($expected, $this->temp->getDirectory());
 		$this->assertStringEndsWith('/', $this->temp->getDirectory());
+	}
+
+	public function testExistsFile() {
+		$expected = $this->temp->create('foo');
+		$result = $this->temp->exists('foo');
+		$expected = file_exists($this->createFilePath('foo'));
+		$this->assertTrue($result);
+		$this->assertSame($expected, $result);
+
+		$this->temp->reset();
+		$result = $this->temp->exists('foo');
+		$expected = file_exists($this->createFilePath('foo'));
+		$this->assertFalse($result);
+		$this->assertSame($expected, $result);
+	}
+
+	public function testExistsDir() {
+		$expected = $this->temp->createDirectory('foo');
+		$result = $this->temp->exists('foo');
+		$expected = file_exists($this->createFilePath('foo'));
+		$this->assertTrue($result);
+		$this->assertSame($expected, $result);
+		$this->assertTrue(is_dir($this->createFilePath('foo')));
+
+		$this->temp->reset();
+		$result = $this->temp->exists('foo');
+		$expected = file_exists($this->createFilePath('foo'));
+		$this->assertFalse($result);
+		$this->assertSame($expected, $result);
+		$this->assertFalse(is_dir($this->createFilePath('foo')));
 	}
 
 }

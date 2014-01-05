@@ -24,7 +24,7 @@ class Temping {
 	//created.
 	protected $dir;
 
-	//array of created filenames with their an id as the key.
+	//array of created filenames with their id as the key.
 	protected $files = array();
 
 	protected function __construct() {
@@ -215,6 +215,26 @@ class Temping {
 			$this->init();
 		}
 		return $this->dir;
+	}
+
+	/**
+	 * Check if a file has been created.
+	 *
+	 * @param mixed $id_or_filename The id returned by create() or the
+	 * filename passed to create().
+	 * @return bool True if the file exists, false otherwise.
+	 */
+	public function exists($id_or_filename) {
+		//check for id
+		//decrement id by 1 as an id of 0 should not be exposed to
+		//the user due to PHP's weak types.
+		$id = (int) $id_or_filename - 1;
+		if(array_key_exists($id, $this->files)) {
+			$filename = $this->files[$id];
+		} else {
+			$filename = $id_or_filename;
+		}
+		return file_exists($this->dir . $filename);
 	}
 
 }
