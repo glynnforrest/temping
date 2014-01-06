@@ -70,7 +70,7 @@ And run composer to update your dependencies:
 
 Creating a blank file
 
-    $temp = new Temping\Temping();
+    $temp = Temping\Temping::getInstance();
     $temp->create('my-file.txt');
     //automatically create subdirectories too
     $temp->create('file/in/sub/directory.php')
@@ -182,7 +182,7 @@ Now armed with Temping, MyFilesUsingTestCase can be refactored.
         protected $temp;
 
         public function setUp() {
-            $this->temp = new Temping\Temping();
+            $this->temp = Temping\Temping::getInstance();
             $this->temp->create(self::file, 'Hello, world!');
             $this->temp->create(self::file2, 'Hello, again!);
         }
