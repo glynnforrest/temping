@@ -3,6 +3,7 @@ vcs: git
 prerequisites:
  - working-copy-check
  - display-last-changes
+ - tests-check
 
 version-generator: semantic
 
