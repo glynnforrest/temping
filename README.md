@@ -85,16 +85,8 @@ Creating a file with contents
 
     $temp->create('my/file.txt', 'Hello, world!');
 
-The create() method returns an id so you can work with the contents of
-the file later, using setContents() and getContents().
-
-    $id = $temp->create('file.txt');
-    $temp->setContents($id, 'Hello, world!');
-    echo $temp->getContents($id);
-    //Hello, world!
-
-If you don't have access to the id returned from the create method you
-can use the filename specified in the create() method too.
+Work with the contents of the file after creation using setContents()
+and getContents().
 
     $filename = 'file.txt';
     $temp->create($filename);
@@ -102,13 +94,14 @@ can use the filename specified in the create() method too.
     echo $temp->getContents($filename);
     //Hello, world!
 
+Files that are created, modified or deleted outside of the Temping
+class are still accessible.
+
+    file_put_contents($temp->getDirectory() . 'foo.txt', 'Hello, world!');
+    echo $temp->getContents('foo.txt');
+    //Hello, world!
+
 Get the full path name of a file
-
-    $id = $temp->create('my-file.php');
-    echo $temp->getPathname($id);
-    // /tmp/php-temping/my-file.php
-
-    //OR
 
     $filename = 'my-file.php';
     $temp->create($filename);
@@ -123,13 +116,6 @@ Get the full path to the Temping directory
 To do other fancy things with your temporary files, you can grab a
 SplFileObject instance.
 
-    $id = $temp->create('my-file.php');
-    $obj = $temp->getFileObject($id);
-    echo $obj->getExtension();
-    //php
-
-    //OR
-
     $filename = 'my-file.php';
     $temp->create($filename);
     $obj = $temp->getFileObject($filename);
@@ -137,38 +123,49 @@ SplFileObject instance.
     //php
 
 The default mode of the SplFileObject is read-only, 'r'. Pass any
-accepted parameter to fopen() in the second argument to get a
+accepted parameter to fopen() as the second argument to get a
 different mode.
 
-    $filename = 'my-file.txt;
+    $filename = 'my-file.txt';
     $temp->create($filename);
     $obj = $temp->getFileObject($filename, 'w');
     //Now able to write to my-file.txt
 
-To check if a file or directory has been created, use exists(). You
-can also use the $id returned by create() for checking a file.
+To check if a file or directory has been created, use exists().
 
     $this->temp->createDirectory('some/dir');
     $this->temp->exists('some/dir');
     //true
 
-    $id = $this->temp->create('foo/bar.txt');
+    $this->temp->create('foo/bar.txt');
     $this->temp->exists('foo/bar.txt);
-    //true
-    $this->temp->exists($id);
     //true
 
     $this->temp->exists('something');
     //false
 
+Exists will also check for files that weren't created by Temping
+explicitly, but are still present in the temporary directory. This is
+useful for testing code that is expected to create files.
+
+    touch($temp->getDirectory() . 'foo.txt');
+    $temp->exists('foo.txt');
+    //true
+
+    //In a test. Assume MyLogger takes the log directory in the
+    //constructor
+    $obj = new MyLogger($temp->getDirectory());
+    $obj->log('testing');
+    $this->assertTrue($temp->exists('log.log'));
 
 Finally, to obliterate all the temporary files you've created, call
 reset().
 
-    $temp->create('file1.txt');
-    $temp->create('file2.txt');
-    $temp->create('file3.txt');
+    $temp->create('file1.txt')->create('file2.txt')->create('file3.txt');
     $temp->reset();
+
+All files inside the temporary directory will be deleted, including
+those that weren't created by Temping explicitly.
 
 Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
@@ -183,8 +180,8 @@ Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
         public function setUp() {
             $this->temp = Temping\Temping::getInstance();
-            $this->temp->create(self::file, 'Hello, world!');
-            $this->temp->create(self::file2, 'Hello, again!);
+            $this->temp->create(self::file, 'Hello, world!')
+                       ->create(self::file2, 'Hello, again!);
         }
 
         public function tearDown() {
@@ -199,6 +196,19 @@ Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
 Much better!
 
+### Chainable methods
+
+Methods return the Temping instance where it makes sense. This makes
+it easy to do stuff like this:
+
+    Temping::getInstance()
+        ->create('foo')
+        ->create('bar', 'Hello world')
+        ->setContents('foo', 'bar')
+        ->reset();
+
+The methods getInstance(), init(), reset(), create(),
+createDirectory() and setContents() are chainable.
 
 ### Where are the files stored?
 
