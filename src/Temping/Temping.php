@@ -15,8 +15,6 @@ class Temping {
 
 	const TEMPING_DIR_NAME = 'php-temping/';
 
-	protected static $instance;
-
 	//set to true after init(), false after reset()
 	protected $init;
 
@@ -27,20 +25,7 @@ class Temping {
 	//array of created filenames with their id as the key.
 	protected $files = array();
 
-	protected function __construct() {
-	}
-
-	/**
-	 * Get an instance of Temping, ensuring a temporary directory has
-	 * been created.
-	 *
-	 * @return Temping instance of the Temping class.
-	 */
-	public static function getInstance() {
-		if(!self::$instance) {
-			self::$instance = new self();
-		}
-		return self::$instance;
+	public function __construct() {
 	}
 
 	/**
