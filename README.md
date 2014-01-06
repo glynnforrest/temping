@@ -188,15 +188,12 @@ Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
     class MyFilesUsingTestCase extends \PHPUnit_Framework_TestCase {
 
-        const file = 'file.txt';
-        const file2 = 'file2.txt';
-
         protected $temp;
 
         public function setUp() {
             $this->temp = Temping\Temping::getInstance();
-            $this->temp->create(self::file, 'Hello, world!')
-                       ->create(self::file2, 'Hello, again!);
+            $this->temp->create('file.txt', 'Hello, world!')
+                       ->create('file2.txt', 'Hello, again!);
         }
 
         public function tearDown() {
