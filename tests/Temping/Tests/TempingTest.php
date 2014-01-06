@@ -18,11 +18,11 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	protected $temp;
 
 	public function setUp() {
-		$this->temp = new Temping();
+		$this->temp = Temping::getInstance();
 	}
 
 	public function tearDown() {
-		$this->temp->reset();
+		Temping::getInstance()->reset();
 	}
 
 	protected function createFilePath($filename) {
@@ -31,6 +31,10 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 			$tmp_dir .= '/';
 		}
 		return $tmp_dir . Temping::TEMPING_DIR_NAME . $filename;
+	}
+
+	public function testGetInstance() {
+		$this->assertTrue($this->temp instanceof Temping);
 	}
 
 	public function testTempingDirIsNotCreatedOnConstruct() {
@@ -74,9 +78,9 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	public function testTempingDirRecreatedAfterReset() {
 		$this->temp->reset();
 		$this->assertFileNotExists($this->createFilePath(null));
-		$this->temp->create('file');
+		$another_instance = Temping::getInstance();
+		$another_instance->create('file');
 		$this->assertFileExists($this->createFilePath(null));
-		$this->assertFileExists($this->createFilePath('file'));
 	}
 
 	public function testTempingDirRecreatedAfterResetSameInstance() {
