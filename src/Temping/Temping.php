@@ -24,15 +24,11 @@ class Temping {
 	//created.
 	protected $dir;
 
-	//array of created filenames with their id as the key.
-	protected $files = array();
-
 	protected function __construct() {
 	}
 
 	/**
-	 * Get an instance of Temping, ensuring a temporary directory has
-	 * been created.
+	 * Get an instance of Temping.
 	 *
 	 * @return Temping instance of the Temping class.
 	 */
@@ -45,8 +41,10 @@ class Temping {
 
 	/**
 	 * Create the temporary directory if it doesn't exist.
+	 *
+	 * @return Temping This Temping instance.
 	 */
-	protected function init() {
+	public function init() {
 		if($this->init) {
 			return true;
 		}
@@ -59,15 +57,18 @@ class Temping {
 			mkdir($this->dir, 0777);
 		}
 		$this->init = true;
+		return $this;
 	}
 
 	/**
 	 * Delete the temporary directory created by Temping and all files
 	 * within it.
+	 *
+	 * @return Temping This Temping instance.
 	 */
 	public function reset() {
 		if(!$this->init) {
-			return true;
+			return $this;
 		}
 		$iterator = new RecursiveIteratorIterator(
 			new RecursiveDirectoryIterator(
@@ -86,38 +87,31 @@ class Temping {
 		if(file_exists($this->dir)) {
 			rmdir($this->dir);
 		}
-		$this->files = array();
 		$this->init = false;
+		return $this;
 	}
 
 	/**
-	 * Create $filename containing $content in the temporary
+	 * Create $file containing $content in the temporary
 	 * directory. Directories will be created automatically if they
 	 * don't exist.
 	 *
-	 * @param string $filename File path of the file to create.
+	 * @param string $file The path of the file to create, relative to
+	 * the temporary directory (e.g. 'foo/bar.txt')
 	 * @param string $content Content to write to the file.
-	 * @return int $id The id of the created file.
+	 * @return Temping This Temping instance.
 	 */
-	public function create($filename, $content = null) {
+	public function create($file, $content = null) {
 		$this->init();
-		$last_slash = strrpos($filename, '/');
+		$last_slash = strrpos($file, '/');
 		if($last_slash) {
-			$directory = substr($filename, 0, $last_slash);
+			$directory = substr($file, 0, $last_slash);
 			$this->createDirectory($directory);
 		}
-		$filepath = $this->dir . $filename;
-		$file = new SplFileObject($filepath, 'w');
-		$file->fwrite($content);
-		//check if the file has been used before
-		$id = array_search($filename, $this->files);
-		if($id !== false) {
-			return $id + 1;
-		}
-		$this->files[] = $filename;
-		end($this->files);
-		//don't allow an id of 0 to be returned due to PHP's weak types
-		return key($this->files) + 1;
+		$filepath = $this->dir . $file;
+		$obj = new SplFileObject($filepath, 'w');
+		$obj->fwrite($content);
+		return $this;
 	}
 
 	/**
@@ -125,7 +119,9 @@ class Temping {
 	 * directory. Sub-directories will be created automatically if
 	 * they don't exist.
 	 *
-	 * @param string $directory Path of the directory to create.
+	 * @param string $directory The path of the directory to create,
+	 * relative to the temporary directory (e.g. 'foo/bar.txt')
+	 * @return Temping This Temping instance.
 	 */
 	public function createDirectory($directory) {
 		$this->init();
@@ -133,62 +129,53 @@ class Temping {
 		if(!file_exists($path)) {
 			mkdir($path, 0777, true);
 		}
-		return true;
+		return $this;
 	}
 
 	/**
 	 * Get an instance of SplFileObject for a file.
 	 *
-	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to the create().
-	 * @param string $mode The type of access to the file, same as fopen().
+	 * @param string $file The path of the file, relative to the
+	 * temporary directory (e.g. 'foo/bar.txt')
+	 * @param string $mode The type of access to the file, same as fopen()
 	 * @return \SplFileObject
 	 * @throws \Exception
 	 */
-	public function getFileObject($id_or_filename, $mode = 'r') {
-		if(in_array($id_or_filename, $this->files)) {
-			//filename supplied
-			$filename = $id_or_filename;
-		} else {
-			//check for id
-			//decrement id by 1 as an id of 0 should not be exposed to
-			//the user due to PHP's weak types.
-			$id = (int) $id_or_filename - 1;
-			if(array_key_exists($id, $this->files)) {
-				$filename = $this->files[$id];
-			} else {
-				throw new \Exception("File or id not found: $id_or_filename");
-			}
+	public function getFileObject($file, $mode = 'r') {
+		$filepath = $this->dir . $file;
+		//check the filepath exists. It may have been created,
+		//modified or deleted outside of Temping.
+		if(!file_exists($filepath) || !is_writable($filepath)) {
+			throw new \Exception("File not found: '$file'");
 		}
-		return new SplFileObject($this->dir . $filename, $mode);
+		return new SplFileObject($filepath, $mode);
 	}
 
 	/**
 	 * Get the contents of a file.
 	 *
-	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to create().
+	 * @param string $file The path of the file, relative to the
+	 * temporary directory (e.g. 'foo/bar.txt')
 	 * @return string The contents of the file.
 	 */
-	public function getContents($id_or_filename) {
-		$file_object = $this->getFileObject($id_or_filename);
+	public function getContents($file) {
+		$file_object = $this->getFileObject($file);
 		return file_get_contents($file_object->getPathname());
 	}
 
 	/**
 	 * Write $content to a file.
 	 *
-	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to create().
+	 * @param string $file The path of the file, relative to the
+	 * temporary directory (e.g. 'foo/bar.txt')
 	 * @param string $content The content to write to the file.
-	 * @return The number of bytes written
+	 * @return Temping This Temping instance.
 	 * @throws \Exception When the write failed.
 	 */
-	public function setContents($id_or_filename, $content) {
-		$file_object = $this->getFileObject($id_or_filename, 'w');
-		$bytes = $file_object->fwrite($content);
-		if($bytes) {
-			return $bytes;
+	public function setContents($file, $content) {
+		$file_object = $this->getFileObject($file, 'w');
+		if($file_object->fwrite($content)) {
+			return $this;
 		}
 		throw new \Exception("Unable to write to " . $file_object->getPathname());
 	}
@@ -196,18 +183,20 @@ class Temping {
 	/**
 	 * Get the full path name of a file.
 	 *
-	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to create().
+	 * @param string $file The path of the file, relative to the
+	 * temporary directory (e.g. 'foo/bar.txt')
 	 * @return string The full path name of the file.
 	 */
-	public function getPathname($id_or_filename) {
-		$file_object = $this->getFileObject($id_or_filename, 'r');
+	public function getPathname($file) {
+		$file_object = $this->getFileObject($file, 'r');
 		return $file_object->getPathname();
 	}
 
 	/**
 	 * Get the full path name of the Temping directory, ending with a
 	 * trailing slash.
+	 *
+	 * @return string The full path name of the Temping directory.
 	 */
 	public function getDirectory() {
 		$this->init();
@@ -217,21 +206,12 @@ class Temping {
 	/**
 	 * Check if a file has been created.
 	 *
-	 * @param mixed $id_or_filename The id returned by create() or the
-	 * filename passed to create().
+	 * @param string $file The path of the file, relative to the
+	 * temporary directory (e.g. 'foo/bar.txt')
 	 * @return bool True if the file exists, false otherwise.
 	 */
-	public function exists($id_or_filename) {
-		//check for id
-		//decrement id by 1 as an id of 0 should not be exposed to
-		//the user due to PHP's weak types.
-		$id = (int) $id_or_filename - 1;
-		if(array_key_exists($id, $this->files)) {
-			$filename = $this->files[$id];
-		} else {
-			$filename = $id_or_filename;
-		}
-		return file_exists($this->dir . $filename);
+	public function exists($file) {
+		return file_exists($this->dir . $file);
 	}
 
 }

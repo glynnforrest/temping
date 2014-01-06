@@ -35,15 +35,23 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testGetInstance() {
 		$this->assertTrue($this->temp instanceof Temping);
+		$this->assertSame($this->temp, Temping::getInstance());
 	}
 
 	public function testTempingDirIsNotCreatedOnConstruct() {
 		$this->assertFileNotExists($this->createFilePath(null));
 	}
 
+	public function testTempingDirCreatedThenRemovedAfterReset() {
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->init());
+		$this->assertFileExists($this->createFilePath(null));
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->reset());
+		$this->assertFileNotExists($this->createFilePath(null));
+	}
+
 	public function testCreateDirectory() {
 		$dir = 'storage';
-		$this->temp->createDirectory($dir);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->createDirectory($dir));
 		$filepath = $this->createFilePath($dir);
 		$this->assertTrue(is_dir($filepath));
 		$this->temp->reset();
@@ -52,7 +60,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCreateNestedDirectory() {
 		$dir = '/some/deep/nested/directory';
-		$this->temp->createDirectory($dir);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->createDirectory($dir));
 		$filepath = $this->createFilePath($dir);
 		$this->assertTrue(is_dir($filepath));
 		$this->temp->reset();
@@ -61,18 +69,11 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCreateSingleFile() {
 		$filename = 'file.txt';
-		$this->temp->create($filename);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename));
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 		$this->temp->reset();
 		$this->assertFileNotExists($filepath);
-	}
-
-	public function testTempingDirCreatedThenRemovedAfterReset() {
-		$this->temp->create('file');
-		$this->assertFileExists($this->createFilePath(null));
-		$this->temp->reset();
-		$this->assertFileNotExists($this->createFilePath(null));
 	}
 
 	public function testTempingDirRecreatedAfterReset() {
@@ -93,7 +94,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCreateFileWithinDirectory() {
 		$filename = '.hidden/secrets.gpg';
-		$this->temp->create($filename);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename));
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 		$this->temp->reset();
@@ -102,7 +103,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCreateFileDeepWithinDirectory() {
 		$filename = 'deeply/nested/dirs/with/stuff/in/file.php';
-		$this->temp->create($filename);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename));
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 		$this->temp->reset();
@@ -111,21 +112,21 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCreateFileStartingWithSlash () {
 		$filename = '/folder/file.txt';
-		$this->temp->create($filename);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename));
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 	}
 
 	public function testCreateFileWithManySlashes() {
 		$filename = 'file//with////toomanyslashes';
-		$this->temp->create($filename);
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename));
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 	}
 
 	public function testCreateFileWithContents() {
 		$filename = 'text/files/message.txt';
-		$this->temp->create($filename, 'Hello world');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename, 'Hello world'));
 		$filepath = $this->createFilePath($filename);
 		$this->assertFileExists($filepath);
 		$this->assertEquals('Hello world', file_get_contents($filepath));
@@ -133,92 +134,57 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFileNotExists($filepath);
 	}
 
-	public function testCreateReturnsId() {
-		$filename = 'file';
-		$id = $this->temp->create($filename);
-		$this->assertEquals(1, $id);
-		$other_filename = 'file2';
-		$other_id = $this->temp->create($other_filename);
-		$this->assertEquals(2, $other_id);
-	}
-
-	public function testCreateSameFileReturnsSameId() {
-		$filename = 'testing/.test';
-		$id = $this->temp->create($filename);
-		$other_id = $this->temp->create($filename);
-		$this->assertEquals($id, $other_id);
-	}
-
 	public function testCreateSameFileCanOverwriteContent() {
 		$filename = 'my-file.txt';
-		$id = $this->temp->create($filename, 'Hello world');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename, 'Hello world'));
 		$this->assertEquals('Hello world', file_get_contents($this->createFilePath($filename)));
-		$other_id = $this->temp->create($filename, 'Hello again');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->create($filename, 'Hello again'));
 		$this->assertEquals('Hello again', file_get_contents($this->createFilePath($filename)));
-		$this->assertEquals($id, $other_id);
-	}
-
-	public function testResetResetInternalFilesArray() {
-		$filename = 'file';
-		$id = $this->temp->create($filename);
-		$this->assertEquals(1, $id);
-		$this->temp->reset();
-		$other_id = $this->temp->create($filename);
-		$this->assertEquals(1, $other_id);
 	}
 
 	public function testGetFileObject() {
 		$filename = 'file.php';
-		$id = $this->temp->create($filename);
-
-		$file_object_id = $this->temp->getFileObject($id);
-		$this->assertTrue($file_object_id instanceof SplFileObject);
+		$this->temp->create($filename);
+		$file_object = $this->temp->getFileObject($filename);
+		$this->assertInstanceOf('\SplFileObject', $file_object);
 		$this->assertEquals(
-			$this->createFilePath($filename), $file_object_id->getPathname());
-
-		$file_object_filename = $this->temp->getFileObject($filename);
-		$this->assertTrue($file_object_filename instanceof SplFileObject);
-		$this->assertEquals(
-			$this->createFilePath($filename), $file_object_filename->getPathname());
-		$this->assertEquals('php', $file_object_id->getExtension());
+			$this->createFilePath($filename), $file_object->getPathname());
+		$this->assertEquals('php', $file_object->getExtension());
 	}
 
 	public function testGetFileObjectThrowsExceptionOnUnknownFile() {
-		$id = 42;
-		$message = 'File or id not found: ' . $id;
+		$filename = 'foo.sql';
+		$message = "File not found: '$filename'";
 		$this->setExpectedException('\Exception', $message);
-		$this->temp->getFileObject($id);
+		$this->temp->getFileObject($filename);
 	}
 
 	public function testGetContents() {
 		$filename = 'test/file_with_contents.txt';
 		$content = 'Content of text file';
-		$id = $this->temp->create($filename, $content);
-		$this->assertEquals($content, $this->temp->getContents($id));
+		$this->temp->create($filename, $content);
 		$this->assertEquals($content, $this->temp->getContents($filename));
 	}
 
 	public function testGetContentsThrowsExceptionOnUnknownFile() {
 		$filename = 'file-not-created-yet.txt';
-		$message = 'File or id not found: ' . $filename;
+		$message = "File not found: '$filename'";
 		$this->setExpectedException('\Exception', $message);
 		$this->temp->getContents($filename);
 	}
 
 	public function testSetContents() {
 		$filename = 'my_message.md';
-		$id = $this->temp->create($filename, 'Hello world');
+		$this->temp->create($filename, 'Hello world');
 		$filepath = $this->createFilePath($filename);
 		$this->assertEquals('Hello world', file_get_contents($filepath));
-		$this->temp->setContents($filename, 'Hello again');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->setContents($filename, 'Hello again'));
 		$this->assertEquals('Hello again', file_get_contents($filepath));
-		$this->temp->setContents($id, 'Hello once more');
-		$this->assertEquals('Hello once more', file_get_contents($filepath));
 	}
 
 	public function testSetContentsThrowsExceptionOnUnknownFile() {
 		$filename = 'unknown';
-		$message = 'File or id not found: ' . $filename;
+		$message = "File not found: '$filename'";
 		$this->setExpectedException('\Exception', $message);
 		$this->temp->setContents($filename, 'Some content');
 	}
@@ -235,24 +201,22 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	public function testFilenamesCanBeIntegers() {
 		$filename = 1;
 		$content = 'Contents of integer-named file';
-		$id = $this->temp->create($filename, $content);
+		$this->temp->create($filename, $content);
 		$this->assertEquals($content, $this->temp->getContents($filename));
-		$this->assertEquals($content, $this->temp->getContents($id));
 	}
 
 	public function testGetPathname() {
 		$filename = 'folder/my-db.sql';
-		$id = $this->temp->create($filename);
+		$this->temp->create($filename);
 		$expected = $this->createFilePath($filename);
-		$this->assertEquals($expected, $this->temp->getPathname($id));
 		$this->assertEquals($expected, $this->temp->getPathname($filename));
 	}
 
 	public function testGetPathnameThrowsExceptionOnUnknownFile() {
-		$id = 44;
-		$message = 'File or id not found: 44';
+		$file = 'unknown';
+		$message = "File not found: '$file'";
 		$this->setExpectedException('\Exception', $message);
-		$this->temp->getPathname($id);
+		$this->temp->getPathname($file);
 	}
 
 	public function testGetDirectory() {
@@ -263,10 +227,8 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testExistsFile() {
 		$file = 'path/to/foo.txt';
-		//id
-		$id = $this->temp->create($file);
-		$this->assertTrue($this->temp->exists($id));
-		//filename
+		$this->temp->create($file);
+
 		$result = $this->temp->exists($file);
 		$this->assertTrue($result);
 		//same as file_exists?
@@ -275,9 +237,6 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 		$this->temp->reset();
 
-		//id
-		$this->assertFalse($this->temp->exists($id));
-		//filename
 		$result = $this->temp->exists($file);
 		$this->assertFalse($result);
 		//same as file_exists?
@@ -288,7 +247,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	public function testExistsDir() {
 		$dir = '/path/to/some/dir';
 		$this->temp->createDirectory($dir);
-		//filename
+
 		$result = $this->temp->exists($dir);
 		$this->assertTrue($result);
 		//same as file_exists?
@@ -298,13 +257,33 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 		$this->temp->reset();
 
-		//filename
 		$result = $this->temp->exists($dir);
 		$this->assertFalse($result);
 		//same as file_exists?
 		$expected = file_exists($this->createFilePath($dir));
 		$this->assertSame($expected, $result);
 		$this->assertFalse(is_dir($this->createFilePath($dir)));
+	}
+
+	public function testExistsNotCreatedByTemping() {
+		$this->temp->init();
+		$file = 'bar.txt';
+		file_put_contents($this->createFilePath($file), 'hello world');
+		$this->assertTrue($this->temp->exists($file));
+	}
+
+	public function testGetFileObjectNotCreatedByTemping() {
+		$this->temp->init();
+		$file = 'bar.txt';
+		file_put_contents($this->createFilePath($file), 'hello world');
+		$this->assertInstanceOf('\SplFileObject', $this->temp->getFileObject($file));
+	}
+
+	public function testGetContentsNotCreatedByTemping() {
+		$this->temp->init();
+		$file = 'foo.txt';
+		file_put_contents($this->createFilePath($file), 'hello world');
+		$this->assertSame('hello world', $this->temp->getContents($file));
 	}
 
 }
