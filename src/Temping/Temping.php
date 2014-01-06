@@ -32,6 +32,9 @@ class Temping {
 	 * Create the temporary directory if it doesn't exist.
 	 */
 	protected function init() {
+		if($this->init) {
+			return true;
+		}
 		$directory = sys_get_temp_dir();
 		if(substr($directory, -1) !== '/') {
 			$directory .= '/';
@@ -82,9 +85,7 @@ class Temping {
 	 * @return int $id The id of the created file.
 	 */
 	public function create($filename, $content = null) {
-		if(!$this->init) {
-			$this->init();
-		}
+		$this->init();
 		$last_slash = strrpos($filename, '/');
 		if($last_slash) {
 			$directory = substr($filename, 0, $last_slash);
@@ -112,9 +113,7 @@ class Temping {
 	 * @param string $directory Path of the directory to create.
 	 */
 	public function createDirectory($directory) {
-		if(!$this->init) {
-			$this->init();
-		}
+		$this->init();
 		$path = $this->dir . $directory;
 		if(!file_exists($path)) {
 			mkdir($path, 0777, true);
@@ -196,9 +195,7 @@ class Temping {
 	 * trailing slash.
 	 */
 	public function getDirectory() {
-		if(!$this->init) {
-			$this->init();
-		}
+		$this->init();
 		return $this->dir;
 	}
 
