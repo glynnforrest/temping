@@ -158,14 +158,29 @@ useful for testing code that is expected to create files.
     $obj->log('testing');
     $this->assertTrue($temp->exists('log.log'));
 
-Finally, to obliterate all the temporary files you've created, call
-reset().
+To obliterate all the files in the temporary directory, plus the
+directory itself, call reset().
 
     $temp->create('file1.txt')->create('file2.txt')->create('file3.txt');
     $temp->reset();
 
 All files inside the temporary directory will be deleted, including
 those that weren't created by Temping explicitly.
+
+The temporary directory isn't created until a method is called that
+alters the file system. If you are creating files another way, call
+init() manually to ensure the temporary directory exists. init() is
+called automatically when using any Temping method that alters the
+file system. Be aware that calling reset() will remove the temporary
+directory, and you'll need to call init() again.
+
+    $temp->init();
+    //temporary directory created
+    $obj = new MyLogger($temp->getDirectory());
+    $temp->remove();
+    //temporary directory doesn't exist any more
+    $temp->create('foo');
+    //temporary directory recreated automatically
 
 Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
