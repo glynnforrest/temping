@@ -56,7 +56,7 @@ composer.json file:
 
     {
         "require": {
-            "glynnforrest/temping": "dev-master"
+            "glynnforrest/temping": "0.3.*"
         }
     }
 
