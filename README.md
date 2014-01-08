@@ -158,6 +158,25 @@ useful for testing code that is expected to create files.
     $obj->log('testing');
     $this->assertTrue($temp->exists('log.log'));
 
+To check if a directory is empty, use isEmpty(). This function will
+also return true if the directory doesn't exist.
+
+    $this->temp->createDirectory('foo/bar');
+    $this->temp->isEmpty('foo/bar');
+    //true
+    $this->temp->create('foo/bar/baz.txt');
+    $this->temp->isEmpty('foo/bar');
+    //false
+
+Leave the $dir argument blank to check if the temping directory is
+empty.
+
+    $this->temp->isEmpty();
+    //true
+    $this->temp->create('foo.php');
+    $this->temp->isEmpty();
+    //false
+
 To obliterate all the files in the temporary directory, plus the
 directory itself, call reset().
 
