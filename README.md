@@ -255,10 +255,11 @@ it easy to do stuff like this:
         ->create('foo')
         ->create('bar', 'Hello world')
         ->setContents('foo', 'bar')
+        ->delete('bar')
         ->reset();
 
 The methods getInstance(), init(), reset(), create(),
-createDirectory() and setContents() are chainable.
+createDirectory(), delete() and setContents() are chainable.
 
 ### Where are the files stored?
 
