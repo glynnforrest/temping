@@ -70,7 +70,7 @@ And run composer to update your dependencies:
 
 Creating a blank file
 
-    $temp = Temping\Temping::getInstance();
+    $temp = new Temping\Temping();
     $temp->create('my-file.txt');
     //automatically create subdirectories too
     $temp->create('file/in/sub/directory.php')
@@ -205,20 +205,20 @@ directory itself, call reset().
 All files inside the temporary directory will be deleted, including
 those that weren't created by Temping explicitly.
 
-The temporary directory isn't created until a method is called that
-alters the file system. If you are creating files another way, call
-init() manually to ensure the temporary directory exists. init() is
-called automatically when using any Temping method that alters the
-file system. Be aware that calling reset() will remove the temporary
-directory, and you'll need to call init() again.
+If you need to recreate the temporary directory after calling reset(),
+use init(). By default, init() is called by all Temping methods that
+modify the filesystem.
 
-    $temp->init();
-    //temporary directory created
-    $obj = new MyLogger($temp->getDirectory());
-    $temp->remove();
+    $temp->reset();
     //temporary directory doesn't exist any more
     $temp->create('foo');
     //temporary directory recreated automatically
+
+    $obj = new MyLogger($temp->getDirectory());
+    $temp->reset();
+    //temporary directory doesn't exist any more
+    $temp->init();
+    //temporary directory recreated for MyLogger to use
 
 Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
@@ -229,7 +229,7 @@ Now armed with Temping, MyFilesUsingTestCase can be refactored.
         protected $temp;
 
         public function setUp() {
-            $this->temp = Temping\Temping::getInstance();
+            $this->temp = new Temping\Temping();
             $this->temp->create('file.txt', 'Hello, world!')
                        ->create('file2.txt', 'Hello, again!);
         }
@@ -251,14 +251,14 @@ Much better!
 Methods return the Temping instance where it makes sense. This makes
 it easy to do stuff like this:
 
-    Temping::getInstance()
-        ->create('foo')
-        ->create('bar', 'Hello world')
-        ->setContents('foo', 'bar')
-        ->delete('bar')
-        ->reset();
 
-The methods getInstance(), init(), reset(), create(),
+    $temp->create('foo')
+         ->create('bar', 'Hello world')
+         ->setContents('foo', 'bar')
+         ->delete('bar')
+         ->reset();
+
+The methods init(), reset(), create(),
 createDirectory(), delete() and setContents() are chainable.
 
 ### Where are the files stored?
