@@ -138,10 +138,19 @@ To check if a file or directory has been created, use exists().
     //true
 
     $this->temp->create('foo/bar.txt');
-    $this->temp->exists('foo/bar.txt);
+    $this->temp->exists('foo/bar.txt');
     //true
 
     $this->temp->exists('something');
+    //false
+
+Leave the $path argument blank to check if the temping directory
+exists.
+
+    $this->temp->exists();
+    //true
+    $this->temp->reset();
+    $this->temp->exists();
     //false
 
 Exists will also check for files that weren't created by Temping

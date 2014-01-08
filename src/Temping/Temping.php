@@ -212,7 +212,7 @@ class Temping {
 	 * if the temping directory exists.
 	 * @return bool True if the file exists, false otherwise.
 	 */
-	public function exists($path) {
+	public function exists($path = null) {
 		return file_exists($this->dir . $path);
 	}
 

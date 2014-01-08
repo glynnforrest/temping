@@ -269,6 +269,12 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse($this->temp->exists('foo'));
 	}
 
+	public function testExistsNoArg() {
+		$this->assertFalse($this->temp->exists());
+		$this->temp->init();
+		$this->assertTrue($this->temp->exists());
+	}
+
 	public function testExistsNotCreatedByTemping() {
 		$this->temp->init();
 		$file = 'bar.txt';
