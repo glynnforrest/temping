@@ -314,4 +314,44 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse($this->temp->isEmpty('foo'));
 	}
 
+	public function testDeleteFile() {
+		$file = 'foo/bar/foo.txt';
+		$this->temp->create($file);
+		$this->assertFileExists($this->createFilePath($file));
+		$this->assertFileExists($this->createFilePath('foo/bar'));
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete($file));
+		$this->assertFileNotExists($this->createFilePath($file));
+		$this->assertFileExists($this->createFilePath('foo/bar'));
+	}
+
+	public function testDeleteNonExistentFile() {
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('not_here'));
+		$this->assertFileNotExists($this->createFilePath('not_here'));
+	}
+
+	public function testDeleteEmptyDir() {
+		$this->temp->createDirectory('foo');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('foo'));
+		$this->assertFileNotExists($this->createFilePath('foo'));
+	}
+
+	public function testNoDeleteForNonEmptyDir() {
+		$this->temp->create('foo/bar.txt');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('foo'));
+		$this->assertFileExists($this->createFilePath('foo'));
+		$this->assertFileExists($this->createFilePath('foo/bar.txt'));
+
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('foo/bar.txt'));
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('foo'));
+		$this->assertFileNotExists($this->createFilePath('foo'));
+		$this->assertFileNotExists($this->createFilePath('foo/bar.txt'));
+	}
+
+	public function testDeleteNonEmptyDir() {
+		$this->temp->create('foo/bar.txt');
+		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('foo', true));
+		$this->assertFileNotExists($this->createFilePath('foo'));
+		$this->assertFileNotExists($this->createFilePath('foo/bar.txt'));
+	}
+
 }

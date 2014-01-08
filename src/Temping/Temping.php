@@ -71,23 +71,7 @@ class Temping {
 		if(!$this->init) {
 			return $this;
 		}
-		$iterator = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator(
-				$this->dir, RecursiveDirectoryIterator::SKIP_DOTS
-			),
-			RecursiveIteratorIterator::CHILD_FIRST
-		);
-		foreach ($iterator as $file_info) {
-			if(is_file($file_info->getPathname())) {
-				unlink($file_info->getPathname());
-			} else {
-				//because of CHILD_FIRST, all files will be deleted by now
-				rmdir($file_info->getPathname());
-			}
-		}
-		if(file_exists($this->dir)) {
-			rmdir($this->dir);
-		}
+		$this->delete(null, true);
 		$this->init = false;
 		return $this;
 	}
@@ -129,6 +113,48 @@ class Temping {
 		$path = $this->dir . $directory;
 		if(!file_exists($path)) {
 			mkdir($path, 0777, true);
+		}
+		return $this;
+	}
+
+	/**
+	 * Delete a file or directory. A directory will only be deleted if
+	 * it is empty, or if $recursive is set to true.
+	 *
+	 * @param string $path The path of the file or directory, relative
+	 * to the temporary directory (e.g. 'foo/bar.txt').
+	 * @param bool $delete_contents Whether to delete a non-empty
+	 * directory
+	 * @return Temping This Temping instance.
+	 */
+	public function delete($path, $recursive = false) {
+		$file = $this->dir . $path;
+		if(!file_exists($file)) {
+			return $this;
+		}
+		if(!is_dir($file)) {
+			unlink($file);
+			return $this;
+		}
+		if(!$this->isEmpty($path) && !$recursive) {
+			return $this;
+		}
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator(
+				$this->dir, RecursiveDirectoryIterator::SKIP_DOTS
+			),
+			RecursiveIteratorIterator::CHILD_FIRST
+		);
+		foreach ($iterator as $file_info) {
+			if(is_file($file_info->getPathname())) {
+				unlink($file_info->getPathname());
+			} else {
+				//because of CHILD_FIRST, all files will be deleted by now
+				rmdir($file_info->getPathname());
+			}
+		}
+		if(file_exists($this->dir)) {
+			rmdir($this->dir);
 		}
 		return $this;
 	}
