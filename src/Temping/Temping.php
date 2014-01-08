@@ -47,7 +47,7 @@ class Temping {
 	 */
 	public function init() {
 		if($this->init) {
-			return true;
+			return $this;
 		}
 		$directory = sys_get_temp_dir();
 		if(substr($directory, -1) !== '/') {
