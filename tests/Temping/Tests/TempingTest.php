@@ -296,14 +296,15 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame('hello world', $this->temp->getContents($file));
 	}
 
-	public function testIsEmpty() {
+	public function testIsEmptyForDirectory() {
 		$this->assertTrue($this->temp->isEmpty());
 		$this->assertTrue($this->temp->isEmpty('foo'));
 		$this->temp->createDirectory('foo');
+		$this->assertFalse($this->temp->isEmpty());
 		$this->assertTrue($this->temp->isEmpty('foo'));
 	}
 
-	public function testIsNotEmpty() {
+	public function testIsEmptyForFile() {
 		$this->temp->create('foo.txt', 'Hello');
 		$this->assertFalse($this->temp->isEmpty());
 		$this->assertTrue($this->temp->isEmpty('foo'));
