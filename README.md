@@ -131,6 +131,15 @@ different mode.
     $obj = $temp->getFileObject($filename, 'w');
     //Now able to write to my-file.txt
 
+Delete a file or directory
+
+    $temp->delete('my-file.txt');
+    $temp->delete('my-directory/');
+
+If a directory is not empty, the deletion will fail. Pass true as a second argument to delete non-empty directories too.
+
+    $temp->delete('non-empty-directory/', true);
+
 To check if a file or directory has been created, use exists().
 
     $this->temp->createDirectory('some/dir');
