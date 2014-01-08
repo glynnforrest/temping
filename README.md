@@ -136,7 +136,8 @@ Delete a file or directory
     $temp->delete('my-file.txt');
     $temp->delete('my-directory/');
 
-If a directory is not empty, the deletion will fail. Pass true as a second argument to delete non-empty directories too.
+If a directory is not empty, the deletion will fail. Pass true as a
+second argument to delete a non-empty directory too.
 
     $temp->delete('non-empty-directory/', true);
 
