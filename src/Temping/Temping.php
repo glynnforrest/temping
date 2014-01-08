@@ -16,8 +16,6 @@ class Temping {
 
 	const TEMPING_DIR_NAME = 'php-temping/';
 
-	protected static $instance;
-
 	//set to true after init(), false after reset()
 	protected $init;
 
@@ -25,37 +23,37 @@ class Temping {
 	//created.
 	protected $dir;
 
-	protected function __construct() {
-	}
-
 	/**
 	 * Get an instance of Temping.
 	 *
+	 * @param string $directory The location of the temporary
+	 * directory. This machine's temporary directory will be used if
+	 * left blank.
 	 * @return Temping instance of the Temping class.
 	 */
-	public static function getInstance() {
-		if(!self::$instance) {
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
-
-	/**
-	 * Create the temporary directory if it doesn't exist.
-	 *
-	 * @return Temping This Temping instance.
-	 */
-	public function init() {
-		if($this->init) {
-			return $this;
-		}
+	public function __construct($directory = null) {
 		$directory = sys_get_temp_dir();
 		if(substr($directory, -1) !== '/') {
 			$directory .= '/';
 		}
 		$this->dir = $directory . self::TEMPING_DIR_NAME;
-		if(!file_exists($this->dir)) {
+		$this->init();
+	}
+
+	/**
+	 * Ensure the temporary directory exists and is writable.
+	 *
+	 * @return Temping This Temping instance.
+	 */
+	public function init() {
+		//strip the / off the end to check for existence of a file
+		//that has the same name as $this->dir
+		if(!file_exists(substr($this->dir, 0, -1))) {
 			mkdir($this->dir, 0777);
+		} elseif(!is_dir($this->dir)) {
+			throw new \Exception("'$this->dir' is not a directory");
+		} elseif(!is_writable($this->dir)) {
+			throw new \Exception("'$this->dir' is not writable");
 		}
 		$this->init = true;
 		return $this;
@@ -68,9 +66,6 @@ class Temping {
 	 * @return Temping This Temping instance.
 	 */
 	public function reset() {
-		if(!$this->init) {
-			return $this;
-		}
 		$this->delete(null, true);
 		$this->init = false;
 		return $this;

@@ -18,11 +18,16 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	protected $temp;
 
 	public function setUp() {
-		$this->temp = Temping::getInstance();
+		$tamper_file = substr($this->createFilePath(null), 0, -1);
+		if(is_file($tamper_file)) {
+			unlink($tamper_file);
+		}
+
+		$this->temp = new Temping();
 	}
 
 	public function tearDown() {
-		Temping::getInstance()->reset();
+		$this->temp->reset();
 	}
 
 	protected function createFilePath($filename) {
@@ -33,13 +38,8 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		return $tmp_dir . Temping::TEMPING_DIR_NAME . $filename;
 	}
 
-	public function testGetInstance() {
-		$this->assertTrue($this->temp instanceof Temping);
-		$this->assertSame($this->temp, Temping::getInstance());
-	}
-
-	public function testTempingDirIsNotCreatedOnConstruct() {
-		$this->assertFileNotExists($this->createFilePath(null));
+	public function testTempingDirIsCreatedOnConstruct() {
+		$this->assertFileExists($this->createFilePath(null));
 	}
 
 	public function testTempingDirCreatedThenRemovedAfterReset() {
@@ -79,7 +79,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	public function testTempingDirRecreatedAfterReset() {
 		$this->temp->reset();
 		$this->assertFileNotExists($this->createFilePath(null));
-		$another_instance = Temping::getInstance();
+		$another_instance = new Temping();
 		$another_instance->create('file');
 		$this->assertFileExists($this->createFilePath(null));
 	}
@@ -270,9 +270,9 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testExistsNoArg() {
-		$this->assertFalse($this->temp->exists());
-		$this->temp->init();
 		$this->assertTrue($this->temp->exists());
+		$this->temp->reset();
+		$this->assertFalse($this->temp->exists());
 	}
 
 	public function testExistsNotCreatedByTemping() {
@@ -352,6 +352,24 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf('\Temping\Temping', $this->temp->delete('foo', true));
 		$this->assertFileNotExists($this->createFilePath('foo'));
 		$this->assertFileNotExists($this->createFilePath('foo/bar.txt'));
+	}
+
+	public function testRemoveDirectoryOutside() {
+		rmdir($this->createFilePath(null));
+		$this->assertFileNotExists($this->createFilePath(null));
+		$this->temp->create('foo.txt');
+		$this->assertFileExists($this->createFilePath(null));
+	}
+
+	public function testChangeDirectoryToFileOutside() {
+		rmdir($this->createFilePath(null));
+		$this->assertFileNotExists($this->createFilePath(null));
+		$tamper_file = substr($this->createFilePath(null), 0, -1);
+		touch($tamper_file);
+		$this->setExpectedException('\Exception', "'" . $this->createFilePath(null) . "' is not a directory");
+		$this->temp->create('foo.txt');
+		//can't unlink $tamper_file after catching an Exception, so it
+		//is removed in setup().
 	}
 
 }
