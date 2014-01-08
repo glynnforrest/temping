@@ -265,6 +265,10 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse(is_dir($this->createFilePath($dir)));
 	}
 
+	public function testExistsNoInit() {
+		$this->assertFalse($this->temp->exists('foo'));
+	}
+
 	public function testExistsNotCreatedByTemping() {
 		$this->temp->init();
 		$file = 'bar.txt';
@@ -284,6 +288,23 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$file = 'foo.txt';
 		file_put_contents($this->createFilePath($file), 'hello world');
 		$this->assertSame('hello world', $this->temp->getContents($file));
+	}
+
+	public function testIsEmpty() {
+		$this->assertTrue($this->temp->isEmpty());
+		$this->assertTrue($this->temp->isEmpty('foo'));
+		$this->temp->createDirectory('foo');
+		$this->assertTrue($this->temp->isEmpty('foo'));
+	}
+
+	public function testIsNotEmpty() {
+		$this->temp->create('foo.txt', 'Hello');
+		$this->assertFalse($this->temp->isEmpty());
+		$this->assertTrue($this->temp->isEmpty('foo'));
+		$this->temp->createDirectory('foo');
+		$this->assertTrue($this->temp->isEmpty('foo'));
+		$this->temp->create('foo/foo.txt', 'Hello');
+		$this->assertFalse($this->temp->isEmpty('foo'));
 	}
 
 }

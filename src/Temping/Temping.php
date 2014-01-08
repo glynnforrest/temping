@@ -5,6 +5,7 @@ namespace Temping;
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
 use \SplFileObject;
+use \FilesystemIterator;
 
 /**
  * Temping
@@ -204,14 +205,33 @@ class Temping {
 	}
 
 	/**
-	 * Check if a file has been created.
+	 * Check if a file or directory has been created.
 	 *
-	 * @param string $file The path of the file, relative to the
-	 * temporary directory (e.g. 'foo/bar.txt')
+	 * @param string $path The path of the file or directory, relative
+	 * to the temporary directory (e.g. 'foo/bar.txt'). If null, check
+	 * if the temping directory exists.
 	 * @return bool True if the file exists, false otherwise.
 	 */
-	public function exists($file) {
-		return file_exists($this->dir . $file);
+	public function exists($path) {
+		return file_exists($this->dir . $path);
+	}
+
+	/**
+	 * Check if a temporary directory is empty.
+	 *
+	 * This method will also return true if the directory doesn't exist.
+	 *
+	 * @param string $dir The path of the directory, relative to the
+	 * temporary directory. If null, check the entire temporary
+	 * directory.
+	 * @return bool True if the directory is empty, false otherwise.
+	 */
+	public function isEmpty($dir = null) {
+		if(!$this->exists($dir)) {
+			return true;
+		}
+		$i = new FilesystemIterator($this->dir . $dir);
+		return !$i->valid();
 	}
 
 }
