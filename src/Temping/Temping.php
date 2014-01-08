@@ -32,11 +32,18 @@ class Temping {
 	 * @return Temping instance of the Temping class.
 	 */
 	public function __construct($directory = null) {
-		$directory = sys_get_temp_dir();
-		if(substr($directory, -1) !== '/') {
-			$directory .= '/';
+		if(!$directory) {
+			$directory = sys_get_temp_dir();
+			if(substr($directory, -1) !== '/') {
+				$directory .= '/';
+			}
+			$this->dir = $directory . self::TEMPING_DIR_NAME;
+		} else {
+			if(substr($directory, -1) !== '/') {
+				$directory .= '/';
+			}
+			$this->dir = $directory;
 		}
-		$this->dir = $directory . self::TEMPING_DIR_NAME;
 		$this->init();
 	}
 
@@ -48,7 +55,8 @@ class Temping {
 	public function init() {
 		//strip the / off the end to check for existence of a file
 		//that has the same name as $this->dir
-		if(!file_exists(substr($this->dir, 0, -1))) {
+		if(!file_exists(substr($this->dir, 0, -1))
+		   && is_writable(dirname($this->dir))) {
 			mkdir($this->dir, 0777);
 		} elseif(!is_dir($this->dir)) {
 			throw new \Exception("'$this->dir' is not a directory");

@@ -372,4 +372,50 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		//is removed in setup().
 	}
 
+	public function testCustomDir() {
+		$custom_dir = str_replace(Temping::TEMPING_DIR_NAME, 'my-dir/', $this->createFilePath(null));
+		if(is_dir($custom_dir)) {
+			rmdir($custom_dir);
+		}
+		$this->assertFileNotExists($custom_dir);
+
+		$temp = new Temping($custom_dir);
+		$this->assertFileExists($custom_dir);
+		$this->assertSame($custom_dir, $temp->getDirectory());
+		$temp->reset();
+		$this->assertFileNotExists($custom_dir);
+	}
+
+	public function testCustomDirThrowsException() {
+		$custom_dir = '/no-chance';
+		$this->setExpectedException('\Exception');
+		$temp = new Temping($custom_dir);
+	}
+
+	public function testCustomDirAppendsSlash() {
+		$custom_dir = str_replace(Temping::TEMPING_DIR_NAME, 'test-dir', $this->createFilePath(null));
+		$temp = new Temping($custom_dir);
+		$this->assertNotSame($custom_dir, $temp->getDirectory());
+		$this->assertTrue(substr($temp->getDirectory(), -1) === '/');
+		$temp->reset();
+		$this->assertFileNotExists($custom_dir);
+	}
+
+	public function testCustomDirUsage() {
+		$custom_dir = str_replace(Temping::TEMPING_DIR_NAME, 'test-dir', $this->createFilePath(null));
+		$temp = new Temping($custom_dir);
+		$temp->create('foo.txt', 'Hello, Earth');
+		$path = $custom_dir . '/foo.txt';
+		$this->assertFileExists($path);
+		$this->assertSame('Hello, Earth', file_get_contents($path));
+		$temp->create('/foo/bar/baz/etc.txt', 'Howdy');
+		$long_path = $custom_dir . '/foo/bar/baz/etc.txt';
+		$this->assertFileExists($long_path);
+		$this->assertSame('Howdy', file_get_contents($long_path));
+		$temp->reset();
+		$this->assertFileNotExists($path);
+		$this->assertFileNotExists($long_path);
+		$this->assertFileNotExists($custom_dir);
+	}
+
 }
