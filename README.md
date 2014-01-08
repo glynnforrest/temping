@@ -68,9 +68,14 @@ And run composer to update your dependencies:
 
 ## Usage
 
-Creating a blank file
+Get a Temping instance
 
     $temp = new Temping\Temping();
+    //or in a custom directory of your choice
+    $temp = new Temping\Temping('path/to/my/dir');
+
+Creating a blank file
+
     $temp->create('my-file.txt');
     //automatically create subdirectories too
     $temp->create('file/in/sub/directory.php')
@@ -263,8 +268,9 @@ createDirectory(), delete() and setContents() are chainable.
 
 ### Where are the files stored?
 
-Internally, Temping uses the output of sys\_get\_temp_dir() to decide
-where to store the temporary files.
+If you don't specify a directory in the constructor, Temping uses the
+output of sys\_get\_temp_dir() to decide where to store the temporary
+files.
 
 For example:
 
