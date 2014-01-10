@@ -225,6 +225,15 @@ modify the filesystem.
     $temp->init();
     //temporary directory recreated for MyLogger to use
 
+Also, if you want to use the temporary directory as the location to
+test something, but not actually call any Temping methods, call init()
+to create the directory manually.
+
+    $obj = new MyLogger($temp->getDirectory());
+    //no methods called on $temp yet, so temporary directory doesn't exist
+    $temp->init();
+    //temporary directory recreated for MyLogger to use
+
 Now armed with Temping, MyFilesUsingTestCase can be refactored.
 
     <?php
