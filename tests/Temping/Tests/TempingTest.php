@@ -38,8 +38,8 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		return $tmp_dir . Temping::TEMPING_DIR_NAME . $filename;
 	}
 
-	public function testTempingDirIsCreatedOnConstruct() {
-		$this->assertFileExists($this->createFilePath(null));
+	public function testTempingDirIsNotCreatedOnConstruct() {
+		$this->assertFileNotExists($this->createFilePath(null));
 	}
 
 	public function testTempingDirCreatedThenRemovedAfterReset() {
@@ -270,6 +270,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testExistsNoArg() {
+		$this->temp->init();
 		$this->assertTrue($this->temp->exists());
 		$this->temp->reset();
 		$this->assertFalse($this->temp->exists());
@@ -355,6 +356,8 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testRemoveDirectoryOutside() {
+		$this->temp->init();
+		$this->assertFileExists($this->createFilePath(null));
 		rmdir($this->createFilePath(null));
 		$this->assertFileNotExists($this->createFilePath(null));
 		$this->temp->create('foo.txt');
@@ -362,7 +365,6 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testChangeDirectoryToFileOutside() {
-		rmdir($this->createFilePath(null));
 		$this->assertFileNotExists($this->createFilePath(null));
 		$tamper_file = substr($this->createFilePath(null), 0, -1);
 		touch($tamper_file);
@@ -374,12 +376,9 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCustomDir() {
 		$custom_dir = str_replace(Temping::TEMPING_DIR_NAME, 'my-dir/', $this->createFilePath(null));
-		if(is_dir($custom_dir)) {
-			rmdir($custom_dir);
-		}
 		$this->assertFileNotExists($custom_dir);
-
 		$temp = new Temping($custom_dir);
+		$temp->init();
 		$this->assertFileExists($custom_dir);
 		$this->assertSame($custom_dir, $temp->getDirectory());
 		$temp->reset();
@@ -390,6 +389,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$custom_dir = '/no-chance';
 		$this->setExpectedException('\Exception');
 		$temp = new Temping($custom_dir);
+		$temp->create('foo');
 	}
 
 	public function testCustomDirAppendsSlash() {

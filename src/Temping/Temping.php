@@ -44,7 +44,6 @@ class Temping {
 			}
 			$this->dir = $directory;
 		}
-		$this->init();
 	}
 
 	/**
