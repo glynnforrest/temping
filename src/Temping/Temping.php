@@ -249,16 +249,16 @@ class Temping {
 	 *
 	 * This method will also return true if the directory doesn't exist.
 	 *
-	 * @param string $dir The path of the directory, relative to the
+	 * @param string $directory The path of the directory, relative to the
 	 * temporary directory. If null, check the entire temporary
 	 * directory.
 	 * @return bool True if the directory is empty, false otherwise.
 	 */
-	public function isEmpty($dir = null) {
-		if(!$this->exists($dir)) {
+	public function isEmpty($directory = null) {
+		if(!$this->exists($directory)) {
 			return true;
 		}
-		$i = new FilesystemIterator($this->dir . $dir);
+		$i = new FilesystemIterator($this->dir . $directory);
 		return !$i->valid();
 	}
 
