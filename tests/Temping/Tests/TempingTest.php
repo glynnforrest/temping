@@ -225,6 +225,11 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertStringEndsWith('/', $this->temp->getDirectory());
 	}
 
+	public function testGetDirectoryDoesNotCreateDir() {
+		$this->temp->getDirectory();
+		$this->assertFileNotExists($this->createFilePath(null));
+	}
+
 	public function testExistsFile() {
 		$file = 'path/to/foo.txt';
 		$this->temp->create($file);

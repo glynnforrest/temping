@@ -16,9 +16,6 @@ class Temping {
 
 	const TEMPING_DIR_NAME = 'php-temping/';
 
-	//set to true after init(), false after reset()
-	protected $init;
-
 	//path to the temporary directory where all Temping files are
 	//created.
 	protected $dir;
@@ -62,7 +59,6 @@ class Temping {
 		} elseif(!is_writable($this->dir)) {
 			throw new \Exception("'$this->dir' is not writable");
 		}
-		$this->init = true;
 		return $this;
 	}
 
@@ -74,7 +70,6 @@ class Temping {
 	 */
 	public function reset() {
 		$this->delete(null, true);
-		$this->init = false;
 		return $this;
 	}
 
@@ -228,7 +223,6 @@ class Temping {
 	 * @return string The full path name of the Temping directory.
 	 */
 	public function getDirectory() {
-		$this->init();
 		return $this->dir;
 	}
 
