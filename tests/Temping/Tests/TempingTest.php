@@ -31,7 +31,7 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	protected function createFilePath($filename) {
-		$tmp_dir = sys_get_temp_dir();
+		$tmp_dir = realpath(sys_get_temp_dir());
 		if(substr($tmp_dir, -1) !== '/') {
 			$tmp_dir .= '/';
 		}

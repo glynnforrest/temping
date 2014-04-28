@@ -30,7 +30,7 @@ class Temping {
 	 */
 	public function __construct($directory = null) {
 		if(!$directory) {
-			$directory = sys_get_temp_dir();
+			$directory = realpath(sys_get_temp_dir());
 			if(substr($directory, -1) !== '/') {
 				$directory .= '/';
 			}
@@ -51,8 +51,7 @@ class Temping {
 	public function init() {
 		//strip the / off the end to check for existence of a file
 		//that has the same name as $this->dir
-		if(!file_exists(substr($this->dir, 0, -1))
-		   && is_writable(dirname($this->dir))) {
+		if(!file_exists(substr($this->dir, 0, -1)) && is_writable(dirname($this->dir))) {
 			mkdir($this->dir, 0777);
 		} elseif(!is_dir($this->dir)) {
 			throw new \Exception("'$this->dir' is not a directory");
