@@ -16,8 +16,8 @@
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {
-        "psr-0" : {
-            "Temping": "src/"
+        "psr-4" : {
+            "Temping\\": "src/Temping"
         }
     }
 }
