@@ -204,15 +204,15 @@ class Temping {
 	}
 
 	/**
-	 * Get the full path name of a file.
+	 * Get the full path name of a file. This method will not check if
+	 * the file exists.
 	 *
 	 * @param string $file The path of the file, relative to the
 	 * temporary directory (e.g. 'foo/bar.txt')
 	 * @return string The full path name of the file.
 	 */
 	public function getPathname($file) {
-		$file_object = $this->getFileObject($file, 'r');
-		return $file_object->getPathname();
+        return $this->dir . $file;
 	}
 
 	/**

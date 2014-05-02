@@ -212,12 +212,13 @@ class TempingTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $this->temp->getPathname($filename));
 	}
 
-	public function testGetPathnameThrowsExceptionOnUnknownFile() {
-		$file = 'unknown';
-		$message = "File not found: '$file'";
-		$this->setExpectedException('\Exception', $message);
-		$this->temp->getPathname($file);
-	}
+    public function testGetPathnameWorksWithUnknownFile()
+    {
+        $filename = 'unknown';
+        $this->assertFalse($this->temp->exists($filename));
+        $expected = $this->createFilePath($filename);
+        $this->assertSame($expected, $this->temp->getPathname($filename));
+    }
 
 	public function testGetDirectory() {
 		$expected = $this->createFilePath(null);
