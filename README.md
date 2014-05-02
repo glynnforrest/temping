@@ -56,7 +56,7 @@ composer.json file:
 
     {
         "require": {
-            "glynnforrest/temping": "0.4.*"
+            "glynnforrest/temping": "0.5.*"
         }
     }
 
