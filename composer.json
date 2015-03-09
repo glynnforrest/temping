@@ -1,6 +1,7 @@
 {
     "name": "glynnforrest/temping",
     "description": "Work with temporary files and folders easily across OSes.",
+    "keywords": ["testing", "files"],
     "license": "MIT",
     "authors": [
     {
