@@ -427,6 +427,11 @@ class TempingTest extends \PHPUnit_Framework_TestCase
     public function testCustomDir()
     {
         $custom_dir = str_replace(Temping::TEMPING_DIR_NAME, 'my-dir/', $this->createFilePath(null));
+        //sometimes test failures can leave the custom dir, cleanup
+        //just in case first
+        $cleanup = new Temping($custom_dir);
+        $cleanup->reset();
+
         $this->assertFileNotExists($custom_dir);
         $temp = new Temping($custom_dir);
         $temp->init();
