@@ -32,15 +32,9 @@ class Temping
     {
         if (!$directory) {
             $directory = realpath(sys_get_temp_dir());
-            if (substr($directory, -1) !== '/') {
-                $directory .= '/';
-            }
-            $this->dir = $directory . self::TEMPING_DIR_NAME;
+            $this->dir = rtrim($directory, '/').'/'.self::TEMPING_DIR_NAME;
         } else {
-            if (substr($directory, -1) !== '/') {
-                $directory .= '/';
-            }
-            $this->dir = $directory;
+            $this->dir = rtrim($directory, '/').'/';
         }
     }
 
