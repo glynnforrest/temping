@@ -3,10 +3,7 @@
 namespace Temping\Tests;
 
 use Temping\Temping;
-
 use \SplFileObject;
-
-include(__DIR__ . '/../../bootstrap.php');
 
 /**
  * TempingTest
